@@ -1,11 +1,13 @@
-let cartProducts = document.getElementsByClassName('cart__products');
-let createElement, newQuantity;
+const cartProducts = document.getElementsByClassName('cart__products');
+const products = document.getElementsByClassName('products');
+const cartStyle = document.getElementsByClassName('cart')[0]
+let oldQuantity, newQuantity;
 
-document.addEventListener('click', (e) => {
+products[0].addEventListener('click', (e) => {
 
     if (e.target.className === 'product__quantity-control product__quantity-control_dec') {
         let decQuantity = e.target.nextSibling.nextSibling;
-        if (Number(decQuantity.textContent) > 0) {
+        if (Number(decQuantity.textContent) > 1) {
             decQuantity.textContent = Number(decQuantity.textContent) - 1;
         };
     };
@@ -19,35 +21,37 @@ document.addEventListener('click', (e) => {
         let product = e.target.parentNode.parentNode.parentNode;
         let cartProductImage = product.querySelector('img').src;
         let productQuantityValue = product.getElementsByClassName('product__quantity-value')[0].textContent;
-        let cartProductsList = cartProducts[0].querySelectorAll('.cart__product');
-        cartProductsList.forEach(element => {
-            if (element.dataset.id === product.dataset.id) {
-                newQuantity = product.getElementsByClassName('product__quantity-value')[0].textContent
-                element.getElementsByClassName('cart__product-count')[0].textContent = newQuantity
-                createElement = 'noCreateElement'
-                moveImgProduct(element, product);
-            };
-        });
 
-        if (createElement !== 'noCreateElement') {
-            document.getElementsByClassName('cart')[0].style = 'display: block;'
+        const cart = Array.from(document.querySelectorAll('.cart__product'));
+        const productInCard = cart.find(element => element.dataset.id === product.dataset.id);
+
+        if (productInCard) {
+            newQuantity = Number(product.getElementsByClassName('product__quantity-value')[0].textContent)
+            oldQuantity = Number(productInCard.getElementsByClassName('cart__product-count')[0].textContent)
+            productInCard.getElementsByClassName('cart__product-count')[0].textContent = newQuantity + oldQuantity
+            moveImgProduct(productInCard, product);
+        } else {
+            cartStyle.style = 'display: block;'
             cartProducts[0].insertAdjacentHTML('afterBegin',
                 `<div class="cart__product" data-id="${product.dataset.id}">
-                        <a href="#" class="cart__product-remove">&times;</a>
-                        <img class="cart__product-image" src="${cartProductImage}">
-                        <div class="cart__product-count">${productQuantityValue}</div>
-                     </div>`);
-
+                    <a href="#" class="cart__product-remove">&times;</a>
+                    <img class="cart__product-image" src="${cartProductImage}">
+                    <div class="cart__product-count">${productQuantityValue}</div>
+                </div>`);
         };
+    }
+})
 
-        createElement = 'createElement';
-    };
-
+cartProducts[0].addEventListener('click', (e) => {
     if (e.target.className === 'cart__product-remove') {
         e.target.parentNode.remove();
-
     };
-});
+    let cartList = cartProducts[0].getElementsByClassName('cart__product')
+    if (cartList.length === 0) {
+        cartStyle.style = 'display: none;'
+    }
+})
+
 
 function moveImgProduct(cartProduct, product) {
     let imgProductCart = cartProduct.querySelector('img');
@@ -66,7 +70,6 @@ function moveImgProduct(cartProduct, product) {
             x = x + (deltaX) / n;
             y = y + (deltaY) / n;
             imgProductClone.style = `transform: translate(${x}px, ${y}px);`;
-            console.log(1);
         }, i * 5);
     }
 

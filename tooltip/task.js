@@ -1,20 +1,23 @@
 const a = document.querySelectorAll('a');
-let indexRemove;
+let textHint;
 
-for (let i = 1; i < a.length; i++) {
+for (let i = 0; i < a.length; i++) {
     a[i].href = '#';
     a[i].addEventListener('click', () => {
-        if (indexRemove > 0) {
-            const removeHint = a[indexRemove].getElementsByTagName('div');
-            removeHint[0].remove();          
+        let removeHint = document.getElementsByClassName('tooltip');
+        if (a[i].title === textHint) {
+            removeHint[0].classList.toggle('tooltip_active');
+        } else {
+            if (removeHint.length > 0) {
+                removeHint[0].remove();
+            };
+            let leftHint = a[i].offsetLeft;
+            let topHint = a[i].offsetTop - 50;
+            textHint = a[i].title;
+            a[i].insertAdjacentHTML('afterEnd',
+                `<div class="tooltip tooltip_active" style="left: ${leftHint}px; top: ${topHint}px">
+                    ${textHint}
+                </div>`);
         };
-        let leftHint = a[i].offsetLeft;
-        let topHint = a[i].offsetTop - 50;        
-        const hint = document.createElement('div');
-        hint.className = "tooltip tooltip_active";
-        hint.style = `left: ${leftHint}px; top: ${topHint}px`;
-        hint.textContent = `${a[i].title}`;
-        a[i].appendChild(hint);
-        indexRemove = i;
     });
 };
